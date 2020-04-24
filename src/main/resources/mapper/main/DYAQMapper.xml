@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.DYAQMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MDYAQ">
+        <result column="tstybm" property="tstybm"/>
+        <result column="dybdclx" property="dybdclx"/>
+        <result column="dyfs" property="dyfs"/>
+        <result column="bdbzzqse" property="bdbzzqse"/>
+        <result column="zwlxqssj" property="zwlxqssj"/>
+        <result column="zwlxjssj" property="zwlxjssj"/>
+        <result column="bdcdjzmh" property="bdcdjzmh"/>
+        <result column="djjg" property="djjg"/>
+        <result column="djsj" property="djsj"/>
+        <result column="zxsj" property="zxsj"/>
+        <result column="ywh" property="ywh"/>
+        <result column="qszt" property="qszt"/>
+        <result column="zjjzwzl" property="zjjzwzl"/>
+        <result column="zjjzwdyfw" property="zjjzwdyfw"/>
+        <result column="zgzqse" property="zgzqse"/>
+    </resultMap>
+
+    <resultMap id="TDXGMap" type="com.ztgeo.pointtopoint.handle.middleEntity.TDXG">
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="tstybm" property="tstybm"/>
+        <result column="ghyt" property="ghyt"/>
+        <result column="jzmj" property="jzmj"/>
+        <result column="zl" property="zl"/>
+    </resultMap>
+
+    <resultMap id="FWXGMap" type="com.ztgeo.pointtopoint.handle.middleEntity.FWXG">
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="tstybm" property="tstybm"/>
+        <result column="ghyt" property="ghyt"/>
+        <result column="jzmj" property="jzmj"/>
+        <result column="zl" property="zl"/>
+    </resultMap>
+
+    <!-- 查询抵押权 -->
+    <select id="findDYAQ" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select distinct t.tstybm,t.bdclx as dybdclx,d.dyfs, d.bdbzzqse,d.qlqssj as zwlxqssj,d.qljssj as zwlxjssj,
+        d.bdczmh as bdcdjzmh,d.jgjc as djjg,d.djrq as djsj,d.slbh as ywh,d.lifecycle as qszt,
+        d.zjjzwzl,d.zjjzwdyfw,d.zgzqse,'' as zxsj
+      from dj_dy d
+      left join dj_tsgl t on d.slbh = t.slbh
+      where d.slbh = #{slbh}
+    </select>
+
+    <!-- 房屋相关 -->
+    <select id="findFWXG" resultMap="FWXGMap" parameterType="java.lang.String">
+      select distinct qsdc.zl, nvl2(q.ghyt, q.ghyt, qsdc.ghyt) as ghyt, nvl2(q.jzmj, q.jzmj, qsdc.jzmj) as jzmj, qsdc.bdcdyh, qsdc.tstybm
+      from dj_tsgl tsgl
+      left join fc_h_qsdc qsdc on tsgl.tstybm = qsdc.tstybm
+      left join ql_fwxg q on tsgl.slbh = q.slbh
+      where tsgl.tstybm = #{tstybm} and djzl = '权属'
+    </select>
+
+    <!-- 土地相关 -->
+    <select id="findTDXG" resultMap="TDXGMap" parameterType="java.lang.String">
+      select distinct t.tstybm, q2.bdcdyh, q2.tdzl, q.gytdmj, q.tdyt, q.qlxz
+      from dj_djb d
+      inner join dj_tsgl t on d.slbh = t.slbh
+      inner join zd_qsdc q2 on t.tstybm = q2.tstybm
+      inner join ql_tdxg q on q.slbh = t.slbh
+      where t.tstybm = #{tstybm} and djzl = '权属'
+    </select>
+
+    <!-- 抵押权人 -->
+    <select id="findDYQR" resultType="java.lang.String" parameterType="java.lang.String">
+      select nvl2(qlrgl.qlrmc,qlrgl.qlrmc,qlr.qlrmc) as qlrmc from dj_qlrgl qlrgl left join dj_qlr qlr on qlrgl.qlrid = qlr.qlrid where qlrgl.slbh = #{slbh} and qlrgl.qlrlx = '抵押权人'
+    </select>
+
+    <insert id="saveToDYAQ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_DYQ (ID, BDCDYH, DYBDCLX,
+        ZL, DYR, DYFS, BDBZZQSE,
+        ZWLXQSSJ, ZWLXJSSJ, BDCDJZMH,
+        DJJG, DJSJ, DYQR,
+        ZXSJ, YWH, QSZT,
+        QXDM, ZJJZWZL, ZJJZWDYFW,
+        ZGZQSE, CXRID)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR}, #{item.bdcdyh,jdbcType=VARCHAR}, #{item.dybdclx,jdbcType=VARCHAR},
+            #{item.zl,jdbcType=VARCHAR}, #{item.dyr,jdbcType=VARCHAR}, #{item.dyfs,jdbcType=VARCHAR},
+            #{item.bdbzzqse,jdbcType=VARCHAR},
+            #{item.zwlxqssj,jdbcType=VARCHAR}, #{item.zwlxjssj,jdbcType=VARCHAR}, #{item.bdcdjzmh,jdbcType=VARCHAR},
+            #{item.djjg,jdbcType=VARCHAR}, #{item.djsj,jdbcType=VARCHAR}, #{item.dyqr,jdbcType=VARCHAR},
+            #{item.zxsj,jdbcType=VARCHAR}, #{item.ywh,jdbcType=VARCHAR}, #{item.qszt,jdbcType=VARCHAR},
+            #{item.qxdm,jdbcType=VARCHAR}, #{item.zjjzwzl,jdbcType=VARCHAR},
+            #{item.zjjzwdyfw,jdbcType=VARCHAR},
+            #{item.zgzqse,jdbcType=VARCHAR}, #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectDYAQsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectDYAQ"
+            parameterType="java.lang.String">
+      select distinct BDCDYH, DYBDCLX,
+        ZL, DYR, DYFS, BDBZZQSE,
+        ZWLXQSSJ, ZWLXJSSJ, BDCDJZMH,
+        DJJG, DJSJ, DYQR,
+        ZXSJ, YWH, QSZT,
+        QXDM, ZJJZWZL, ZJJZWDYFW,
+        ZGZQSE from GX_DYQ where CXRID=#{cxrId}
+    </select>
+</mapper>

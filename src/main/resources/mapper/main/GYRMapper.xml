@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.GYRMapper" >
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.GYR" >
+        <result column="gyfe" property="gyfe" />
+        <result column="qlrmc" property="qlrmc" />
+        <result column="zjhm" property="zjhm" />
+        <result column="dh" property="dh" />
+    </resultMap>
+
+    <!-- 共有情况 -->
+    <select id="findGYQK" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select qlrgl.gyfe,qlr.qlrmc,qlr.zjhm,qlr.dh from dj_qlrgl qlrgl left join dj_qlr qlr on qlrgl.qlrid = qlr.qlrid where qlrlx = '权利人' and qlrgl.slbh = #{slbh}
+    </select>
+
+</mapper>

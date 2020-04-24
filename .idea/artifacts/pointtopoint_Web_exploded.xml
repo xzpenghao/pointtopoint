@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="pointtopoint:Web exploded">
+    <output-path>$PROJECT_DIR$/classes/artifacts/pointtopoint_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="pointtopoint/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="pointtopoint" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

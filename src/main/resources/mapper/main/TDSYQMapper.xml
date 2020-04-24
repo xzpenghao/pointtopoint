@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.TDSYQMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MTDSYQ">
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="zl" property="zl"/>
+        <result column="zdmj" property="zdmj"/>
+        <result column="yt" property="yt"/>
+        <result column="qlxz" property="qlxz"/>
+        <result column="bdcqzh" property="bdcqzh"/>
+        <result column="djjg" property="djjg"/>
+        <result column="djsj" property="djsj"/>
+        <result column="gyfs" property="gyfs"/>
+        <result column="qszt" property="qszt"/>
+        <result column="qllx" property="qllx"/>
+        <result column="ywh" property="ywh"/>
+        <result column="tstybm" property="tstybm"/>
+    </resultMap>
+    <!-- 查询土地所有权 -->
+    <select id="findTDSYQ" resultMap="BaseResultMap" parameterType="String">
+      select distinct q2.bdcdyh, q2.tdzl as zl, q.gytdmj as zdmj, q.tdyt as yt, q.qlxz,d.bdczh as bdcqzh,d.jgjc as djjg,d.djrq as djsj,d.gyfs,t.lifecycle as qszt, q2.qllx,t.tstybm,t.slbh as ywh
+      from dj_djb d
+        inner join dj_tsgl t on d.slbh = t.slbh
+        inner join zd_qsdc q2 on t.tstybm = q2.tstybm
+        inner join ql_tdxg q on q.slbh = t.slbh
+      where t.slbh = #{slbh}
+    </select>
+    <insert id="saveToTDSYQ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_TDSYQ (BDCDYH, ZL, ZDMJ,
+        MJDW, YT, QLXZ, BDCQZH,
+        DJJG, DJSJ, GYFS,
+        GYR, GYQK, QSZT, YWH,
+        QLRDH, QXDM, QLLX,
+        SFDY, SFCF, ID, CXRID
+        )
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.bdcdyh,jdbcType=VARCHAR}, #{item.zl,jdbcType=VARCHAR}, #{item.zdmj,jdbcType=VARCHAR},
+            #{item.mjdw,jdbcType=VARCHAR}, #{item.yt,jdbcType=VARCHAR}, #{item.qlxz,jdbcType=VARCHAR},
+            #{item.bdcqzh,jdbcType=VARCHAR},
+            #{item.djjg,jdbcType=VARCHAR}, #{item.djsj,jdbcType=VARCHAR}, #{item.gyfs,jdbcType=VARCHAR},
+            #{item.gyr,jdbcType=VARCHAR}, #{item.gyqk,jdbcType=VARCHAR}, #{item.qszt,jdbcType=VARCHAR},
+            #{item.ywh,jdbcType=VARCHAR},
+            #{item.qlrdh,jdbcType=VARCHAR}, #{item.qxdm,jdbcType=VARCHAR}, #{item.qllx,jdbcType=VARCHAR},
+            #{item.sfdy,jdbcType=VARCHAR}, #{item.sfcf,jdbcType=VARCHAR}, #{item.id,jdbcType=VARCHAR},
+            #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectTDSYQsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectTDSYQ"
+            parameterType="java.lang.String">
+      select distinct BDCDYH, ZL, ZDMJ,
+        MJDW, YT, QLXZ, BDCQZH,
+        DJJG, DJSJ, GYFS,
+        GYR, GYQK, QSZT, YWH,
+        QLRDH, QXDM, QLLX,
+        SFDY, SFCF from GX_TDSYQ where CXRID=#{cxrId}
+    </select>
+
+</mapper>

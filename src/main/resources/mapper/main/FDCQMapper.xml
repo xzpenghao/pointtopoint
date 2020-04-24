@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.FDCQMapper" >
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MFDCQ" >
+        <result column="tstybm" property="tstybm"/>
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="fdzl" property="fdzl" />
+        <result column="jzmj" property="jzmj"/>
+        <result column="ghyt" property="ghyt" />
+        <result column="fwxz;" property="fwxz"/>
+        <result column="jgsj" property="jgsj"  />
+        <result column="tdsyqssj" property="tdsyqssj" />
+        <result column="tdsyjssj" property="tdsyjssj"/>
+        <result column="bdcqzh" property="bdcqzh" />
+        <result column="djjg" property="djjg" />
+        <result column="zyjzmj" property="zyjzmj" />
+        <result column="ftjzmj" property="ftjzmj" />
+        <result column="djsj" property="djsj"/>
+        <result column="gyfs" property="gyfs" />
+        <result column="fdcjyjg" property="fdcjyjg"/>
+        <result column="fwjg" property="fwjg" />
+        <result column="fwlx" property="fwlx" />
+        <result column="qszt" property="qszt"/>
+        <result column="ywh" property="ywh"/>
+        <result column="qllx" property="qllx" />
+        <result column="tdqlxz" property="tdqlxz" />
+        <result column="tdsyqr" property="tdsyqr"/>
+        <result column="dytdmj" property="dytdmj"/>
+        <result column="fttdmj" property="fttdmj"  />
+    </resultMap>
+
+    <!-- 查询房地产权 -->
+    <select id="findFDCQ" resultMap="BaseResultMap" parameterType="java.lang.String">
+   select distinct t.tstybm, t.bdcdyh, f.zl as fdzl, nvl2(q.jzmj, q.jzmj, f.jzmj) as jzmj, nvl2(q.ghyt, q.ghyt, f.ghyt) as ghyt,
+    f.fwxz, z.jgrq as jgsj, f.tdqsrq, f.tdzzrq, nvl(d.bdczh,y.bdczmh) as bdcqzh, d.jgjc as djjg, nvl2(q.tnjzmj, q.tnjzmj, f.tnjzmj) as zyjzmj,
+    nvl2(q.ftjzmj, q.ftjzmj, f.ftjzmj) as ftjzmj, d.djrq as djsj, nvl(d.gyfs,y.gyfs), f.qdjg as fdcjyjg, z.fwjg, f.fwlx, d.lifecycle as qszt,
+    t.slbh as ywh, q.qllx, e.qlxz tdqlxz, f.tdsyqr, f.dytdmj, f.fttdmj
+from ql_fwxg q
+left join dj_tsgl t on q.slbh = t.slbh
+left join dj_djb d on d.slbh = t.slbh
+left join dj_yg y on y.slbh = t.slbh
+left join ql_tdxg e on e.slbh = d.slbh
+left join fc_h_qsdc f on t.tstybm = f.tstybm
+left join fc_z_qsdc z on f.lsztybm = z.tstybm
+where t.slbh =#{slbh}
+and f.tstybm is not null
+    </select>
+
+
+    <insert id="saveToFDCQ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_FDCQ (ID, BDCDYH, FDZL,
+        JZMJ, GHYT, FWXZ, JGSJ,
+        TDSYQSSJ, TDSYJSSJ, BDCQZH,
+        DJJG, ZYJZMJ, FTJZMJ,
+        DJSJ, GYFS, FDCJYJG,
+        FWJG, FWLX, GYR, GYQK,
+        QSZT, YWH, QLRDH, QXDM,
+        QLLX, SFDY, SFCF, TDQLXZ,
+        TDSYQR, DYTDMJ, FTTDMJ,
+        CXRID)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR}, #{item.bdcdyh,jdbcType=VARCHAR}, #{item.fdzl,jdbcType=VARCHAR},
+            #{item.jzmj,jdbcType=VARCHAR}, #{item.ghyt,jdbcType=VARCHAR}, #{item.fwxz,jdbcType=VARCHAR}, #{item.jgsj,jdbcType=VARCHAR},
+            #{item.tdsyqssj,jdbcType=VARCHAR}, #{item.tdsyjssj,jdbcType=VARCHAR}, #{item.bdcqzh,jdbcType=VARCHAR},
+            #{item.djjg,jdbcType=VARCHAR}, #{item.zyjzmj,jdbcType=VARCHAR}, #{item.ftjzmj,jdbcType=VARCHAR},
+            #{item.djsj,jdbcType=VARCHAR}, #{item.gyfs,jdbcType=VARCHAR}, #{item.fdcjyjg,jdbcType=VARCHAR},
+            #{item.fwjg,jdbcType=VARCHAR}, #{item.fwlx,jdbcType=VARCHAR}, #{item.gyr,jdbcType=VARCHAR}, #{item.gyqk,jdbcType=VARCHAR},
+            #{item.qszt,jdbcType=VARCHAR}, #{item.ywh,jdbcType=VARCHAR}, #{item.qlrdh,jdbcType=VARCHAR}, #{item.qxdm,jdbcType=VARCHAR},
+            #{item.qllx,jdbcType=VARCHAR}, #{item.sfdy,jdbcType=VARCHAR}, #{item.sfcf,jdbcType=VARCHAR}, #{item.tdqlxz,jdbcType=VARCHAR},
+            #{item.tdsyqr,jdbcType=VARCHAR}, #{item.dytdmj,jdbcType=VARCHAR}, #{item.fttdmj,jdbcType=VARCHAR},
+            #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectFDCQsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectFDCQ"
+            parameterType="java.lang.String">
+      select distinct bdcdyh, fdzl,
+        jzmj, ghyt, fwxz, jgsj,
+        tdsyqssj, tdsyjssj, bdcqzh,
+        djjg, zyjzmj, ftjzmj,
+        djsj, gyfs, fdcjyjg,
+        fwjg, fwlx, gyr, gyqk,
+        qszt, ywh, qlrdh, qxdm,
+        qllx, sfdy, sfcf, tdqlxz,
+        tdsyqr, dytdmj, fttdmj from GX_FDCQ where CXRID=#{cxrId}
+    </select>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.CFDJMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MCFDJ">
+        <result column="tstybm" property="tstybm"/>
+        <result column="bdclx" property="bdclx"/>
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="cfjg" property="cfjg"/>
+        <result column="cflx" property="cflx"/>
+        <result column="cfwh" property="cfwh"/>
+        <result column="cffw" property="cffw"/>
+        <result column="cfqssj" property="cfqssj"/>
+        <result column="cfjssj" property="cfjssj"/>
+        <result column="djjg" property="djjg"/>
+        <result column="djsj" property="djsj"/>
+        <result column="qszt" property="qszt"/>
+        <result column="ywh" property="ywh"/>
+    </resultMap>
+    <!-- 查封登记 -->
+    <select id="findCFDJ" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select distinct t.bdclx,t.tstybm,cf.bdcdyh, cf.cfjg, cf.cflx, cf.cfwh, cf.cffw, cf.cfqssj, cf.cfjssj, cf.djjg,
+        cf.djsj, cf.lifecycle as qszt, cf.slbh as ywh
+        from dj_cf cf left join dj_tsgl t on cf.slbh = t.slbh
+        where cf.slbh = #{slbh}
+    </select>
+
+    <insert id="saveToCFDJ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_CFDJ (ID, BDCDYH, ZL,
+        CFJG, CFLX, CFWH, CFQSSJ,
+        CFJSSJ, DJJG, XH,
+        DJSJ, JFDJSJ, YWH,
+        QSZT, QXDM, CFFW, JFWH,
+        CXRID)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR},
+            #{item.bdcdyh,jdbcType=VARCHAR},
+            #{item.zl,jdbcType=VARCHAR},
+            #{item.cfjg,jdbcType=VARCHAR},
+            #{item.cflx,jdbcType=VARCHAR},
+            #{item.cfwh,jdbcType=VARCHAR},
+            #{item.cfqssj,jdbcType=VARCHAR},
+            #{item.cfjssj,jdbcType=VARCHAR},
+            #{item.djjg,jdbcType=VARCHAR},
+            #{item.xh,jdbcType=NUMERIC},
+            #{item.djsj,jdbcType=VARCHAR},
+            #{item.jfdjsj,jdbcType=VARCHAR},
+            #{item.ywh,jdbcType=VARCHAR},
+            #{item.qszt,jdbcType=VARCHAR},
+            #{item.qxdm,jdbcType=VARCHAR},
+            #{item.cffw,jdbcType=VARCHAR},
+            #{item.jfwh,jdbcType=VARCHAR},
+            #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectCFDJsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectCFDJ"
+            parameterType="java.lang.String">
+      select distinct BDCDYH, ZL,
+        CFJG, CFLX, CFWH, CFQSSJ,
+        CFJSSJ, DJJG, XH,
+        DJSJ, JFDJSJ, YWH,
+        QSZT, QXDM, CFFW, JFWH from GX_CFDJ where CXRID=#{cxrId}
+    </select>
+</mapper>
+
+
+
+

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.CXSQDMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.entity.CXSQD">
+        <result column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="CXSQDH" jdbcType="VARCHAR" property="cxsqdh"/>
+        <result column="HQSJ" jdbcType="DATE" property="hqsj"/>
+        <result column="ZT" jdbcType="VARCHAR" property="zt"/>
+        <result column="CXYWLB" jdbcType="VARCHAR" property="cxywlb"/>
+        <result column="CXFW" jdbcType="INTEGER" property="cxfw"/>
+        <result column="UPDATETIME" jdbcType="DATE" property="updatetime"/>
+        <result column="CXJGBS" jdbcType="VARCHAR" property="cxjgbs"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.ztgeo.pointtopoint.entity.CXSQD">
+    insert into GX_CXSQD (ID, CXSQDH, HQSJ, 
+      ZT, CXYWLB, CXFW,
+      UPDATETIME, CXJGBS)
+    values (#{id,jdbcType=VARCHAR}, #{cxsqdh,jdbcType=VARCHAR}, #{hqsj,jdbcType=DATE},
+      #{zt,jdbcType=VARCHAR}, #{cxywlb,jdbcType=VARCHAR}, #{cxfw,jdbcType=INTEGER},
+      #{updatetime,jdbcType=DATE}, #{cxjgbs,jdbcType=VARCHAR})
+  </insert>
+    <insert id="saveToCXSQD" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_CXSQD(ID,CXSQDH,HQSJ,ZT,CXYWLB,CXFW,UPDATETIME,CXJGBS)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR},
+            #{item.cxsqdh,jdbcType=VARCHAR},
+            #{item.hqsj},
+            #{item.zt,jdbcType=VARCHAR},
+            #{item.cxywlb,jdbcType=VARCHAR},
+            #{item.cxfw,jdbcType=INTEGER},
+            #{item.updatetime},
+            #{item.cxjgbs,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <update id="updateCXSQD" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="begin" close=";end;" separator=";">
+            update GX_CXSQD
+            <set>
+                zt='1'
+            </set>
+            where cxsqdh =#{item ,jdbcType=VARCHAR}
+            and zt is null
+        </foreach>
+    </update>
+
+    <select id="selectCxsqdhs" resultType="java.lang.String">
+        select cxsqdh from GX_CXSQD where zt is null
+    </select>
+
+    <select id="selectCXSQDHS" resultType="com.ztgeo.pointtopoint.entity.CXSQD">
+    SELECT *
+    FROM GX_CXSQD
+    WHERE zt = '1'
+    </select>
+
+    <update id="updateCXSQDById" parameterType="java.util.List">
+       update GX_CXSQD set zt = '2' where id=#{cxsqdhId} and zt = '1'
+    </update>
+
+    <select id="selectResponseCxsqdhs" resultType="com.ztgeo.pointtopoint.entity.CXSQD">
+    SELECT * FROM(
+    SELECT *
+    FROM GX_CXSQD
+    WHERE zt = '2'
+    ) WHERE rownum <![CDATA[<=]]> 1
+    </select>
+
+    <update id="updateCXSQHDByResponseCode">
+       update GX_CXSQD set zt =#{zt},updatetime=#{updatetime} where cxsqdh=#{cxsqdh} and zt = '2'
+    </update>
+
+    <select id="selectFailureData" resultType="com.ztgeo.pointtopoint.entity.CXSQD">
+       select * from (
+       select *  FROM GX_CXSQD )cxsqd
+       inner join gx_result result
+       on cxsqd.cxsqdh = result.cxsqdh
+       where cxsqd.zt ='4' and result.msg like '%申请单号结果已经被领取!%'
+    </select>
+
+    <update id="updateFailureZtByCxsqdh" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="begin" close=";end;" separator=";">
+            UPDATE GX_CXSQD
+            <set>
+                <if test="item != null">
+                    zt = '2'
+                </if>
+            </set>
+            where cxsqdh = #{item,jdbcType=VARCHAR}
+        </foreach>
+    </update>
+
+    <select id="judgeCxsqdhIsExist" parameterType="java.lang.String" resultType="int">
+       select count(*) from GX_CXSQD where cxsqdh =#{cxsqdh}
+    </select>
+
+    <select id="getTotalDataByTime" resultType="java.lang.Integer">
+        select count(distinct cxsqdh) from GX_CXSQD
+        where hqsj &gt; TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss') and hqsj &lt; TO_DATE(#{endTime},'yyyy-mm-dd
+        hh24:mi:ss')
+    </select>
+
+    <select id="getSuccessDataByTime" resultType="java.lang.Integer">
+        select count(distinct cxsqdh) from GX_CXSQD where zt = '3'
+        AND updatetime &gt; TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss') and updatetime &lt; TO_DATE(#{endTime},'yyyy-mm-dd
+        hh24:mi:ss')
+    </select>
+
+    <select id="getFailureDataByTime" resultType="java.lang.Integer">
+        select count(distinct cxsqdh) from GX_CXSQD where zt = '4'
+        AND updatetime &gt; TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss') and updatetime &lt; TO_DATE(#{endTime},'yyyy-mm-dd hh24:mi:ss')
+    </select>
+
+    <select id="getNoFeedbackDataByTime" resultType="java.lang.Integer">
+    select count(distinct cxsqdh) from GX_CXSQD where zt in ('1','2')
+    </select>
+
+    <select id="getErrorInfos" resultType="Map">
+        select a.cxsqdh , a.code from gx_result a
+        inner join (select distinct cxsqdh from gx_cxsqd t where updatetime &gt; TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+        and updatetime &lt; TO_DATE(#{endTime},'yyyy-mm-dd hh24:mi:ss') and zt in ('4')
+        ) b
+        on a.cxsqdh = b.cxsqdh
+        where a.code!='0000'
+    </select>
+
+    <select id="selectCXSQDByCxsqdh" resultType="com.ztgeo.pointtopoint.entity.CXSQD">
+        select * from GX_CXSQD where cxsqdh = #{cxsqdh}
+    </select>
+</mapper>

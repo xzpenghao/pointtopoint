@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.CXR_MSGDirectMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.controller.entity.CXR_MSGDirect">
+        <result column="CXJGBS" property="cxjgbs"/>
+        <result column="OPENID" property="openid"/>
+        <result column="CXSQDH" property="cxsqdh"/>
+        <result column="XZ" property="xz"/>
+        <result column="XM" property="xm"/>
+        <result column="ZJZL" property="zjzl"/>
+        <result column="ZJHM" property="zjhm"/>
+        <result column="BDCQZH" property="bdcqzh"/>
+        <result column="BDCDYH" property="bdcdyh"/>
+        <result column="ZL" property="zl"/>
+        <result column="CXQY" property="cxqy"/>
+        <result column="CXFW" property="cxfw"/>
+        <result column="WSBH" property="wsbh"/>
+        <result column="ZT" property="zt"/>
+        <result column="CXSJ" property="cxsj"/>
+        <result column="QQCCDZ" property="qqccdz"/>
+    </resultMap>
+
+    <!--&lt;!&ndash; 保存网络直接查询接口的查询人 &ndash;&gt;-->
+    <!--<insert id="saveToCXR_MSGDirect" parameterType="com.ztgeo.pointtopoint.controller.entity.CXR_MSGDirect">-->
+    <!--INSERT INTO CXR_MSGDirect(CXJGBS,OPENID,CXSQDH,XZ,XM,ZJZL,ZJHM,BDCQZH,BDCDYH,ZL,CXQY,CXFW,WSBH,ZT,CXSJ,QQCCDZ)-->
+    <!--VALUES(#{cxjgbs},#{openid},#{cxsqdh},#{xz},#{xm},#{zjzl},#{zjhm},#{bdcqzh},#{bdcdyh},#{zl},#{cxqy},#{cxfw},#{wsbh},#{zt},#{cxsj},#{qqccdz})-->
+    <!--</insert>-->
+
+    <!-- 保存网络直接查询接口的查询人 -->
+    <insert id="saveToCXR_MSGDirect" parameterType="java.util.List">
+        insert into CXR_MSGDirect (CXJGBS,OPENID,CXSQDH,XZ,XM,ZJZL,ZJHM,BDCQZH,BDCDYH,ZL,CXQY,CXFW,WSBH,ZT,CXSJ,QQCCDZ)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.cxjgbs},#{item.openid},#{item.cxsqdh},
+            #{item.xz},#{item.xm},#{item.zjzl},#{item.zjhm},
+            #{item.bdcqzh},#{item.bdcdyh},#{item.zl},#{item.cxqy},#{item.cxfw},
+            #{item.wsbh},#{item.zt},#{item.cxsj},#{item.qqccdz}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+
+
+</mapper>

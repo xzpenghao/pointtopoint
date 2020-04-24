@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.CXR_MSGMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.entity.CXR_MSG">
+        <result column="ID" jdbcType="VARCHAR" property="id"/>
+        <result column="CXSQDH_ID" jdbcType="VARCHAR" property="cxsqdhId"/>
+        <result column="QLRMC" jdbcType="VARCHAR" property="qlrmc"/>
+        <result column="QLRZJH" jdbcType="VARCHAR" property="qlrzjh"/>
+        <result column="QLRZJLX" jdbcType="INTEGER" property="qlrzjlx"/>
+        <result column="WSBH" jdbcType="VARCHAR" property="wsbh"/>
+        <result column="CXQY" jdbcType="VARCHAR" property="cxqy"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.ztgeo.pointtopoint.entity.CXR_MSG">
+    insert into GX_CXR_MSG (ID, CXSQDH_ID, QLRMC, 
+      QLRZJH, QLRZJLX, WSBH, CXQY)
+    values (#{id,jdbcType=VARCHAR}, #{cxsqdhId,jdbcType=VARCHAR}, #{qlrmc,jdbcType=VARCHAR},
+      #{qlrzjh,jdbcType=VARCHAR}, #{qlrzjlx,jdbcType=INTEGER}, #{wsbh,jdbcType=VARCHAR},#{cxqy,jdbcType=VARCHAR})
+  </insert>
+    <insert id="saveToCXR_MSG" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_CXR_MSG (ID, CXSQDH_ID, QLRMC,QLRZJH, QLRZJLX, WSBH, CXQY)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR},
+            #{item.cxsqdhId,jdbcType=VARCHAR},
+            #{item.qlrmc,jdbcType=VARCHAR},
+            #{item.qlrzjh,jdbcType=VARCHAR},
+            #{item.qlrzjlx},
+            #{item.wsbh,jdbcType=VARCHAR},
+            #{item.cxqy,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <select id="selectMsgsByCxsqdhId" resultType="com.ztgeo.pointtopoint.entity.CXR_MSG"
+            parameterType="java.lang.String">
+      select id,cxsqdh_Id cxsqdhId,qlrmc,qlrzjh,qlrzjlx,wsbh,cxqy from GX_CXR_MSG where CXSQDH_ID =#{cxsqdhId}
+    </select>
+
+    <select id="getQlrzjlx" resultType="java.lang.String">
+      select qlrzjlx from GX_CXR_MSG where qlrmc=#{qlrmc} and qlrzjh =#{qlrzjh}
+    </select>
+</mapper>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.YYDJMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MYYDJ">
+        <result column="bdclx" property="bdclx"/>
+        <result column="tstybm" property="tstybm"/>
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="yysx" property="yysx"/>
+        <result column="ywh" property="ywh"/>
+        <result column="bdcdjzmh" property="bdcdjzmh"/>
+        <result column="djjg" property="djjg"/>
+        <result column="djsj" property="djsj"/>
+        <result column="qszt" property="qszt"/>
+    </resultMap>
+
+    <!-- 异议登记 -->
+    <select id="findYYDJ" resultMap="BaseResultMap" parameterType="java.lang.String">
+      select distinct t.bdclx,t.bdcdyh,t.tstybm,yy.yysx, yy.bdczmh as bdcdjzmh, yy.jgjc as djjg, yy.djrq as djsj,yy.slbh as ywh,yy.lifecycle as qszt
+      from dj_yy yy
+      left join dj_tsgl t on yy.slbh = t.slbh
+      where yy.slbh = #{slbh}
+    </select>
+
+    <insert id="saveToYYDJ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_YYDJ (ID, BDCDYH, ZL,
+        YYSX, BDCDJZMH, DJJG,
+        DJSJ, ZXSJ, YWH,
+        QSZT, QXDM, CXRID)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR}, #{item.bdcdyh,jdbcType=VARCHAR}, #{item.zl,jdbcType=VARCHAR},
+            #{item.yysx,jdbcType=VARCHAR}, #{item.bdcdjzmh,jdbcType=VARCHAR}, #{item.djjg,jdbcType=VARCHAR},
+            #{item.djsj,jdbcType=VARCHAR}, #{item.zxsj,jdbcType=VARCHAR}, #{item.ywh,jdbcType=VARCHAR},
+            #{item.qszt,jdbcType=VARCHAR}, #{item.qxdm,jdbcType=VARCHAR}, #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+    <select id="selectYYDJsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectYYDJ"
+            parameterType="java.lang.String">
+      select distinct BDCDYH, ZL,
+        YYSX, BDCDJZMH, DJJG,
+        DJSJ, ZXSJ, YWH,
+        QSZT, QXDM from GX_YYDJ where CXRID=#{cxrId}
+    </select>
+</mapper>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.YGDJMapper" >
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.handle.middleEntity.MYGDJ" >
+        <result column="tstybm" property="tstybm"/>
+        <result column="ywh" property="ywh"/>
+        <result column="bdcdjzmh" property="bdcdjzmh" />
+        <result column="djjg" property="djjg"/>
+        <result column="djsj" property="djsj" />
+        <result column="ygdjzl" property="ygdjzl"/>
+        <result column="gyfs" property="gyfs"  />
+        <result column="qszt" property="qszt" />
+        <result column="zxsj" property="zxsj"/>
+    </resultMap>
+
+    <resultMap id="YGFWXGMap" type="com.ztgeo.pointtopoint.handle.middleEntity.YGFWXG" >
+        <result column="zl" property="zl"/>
+        <result column="ghyt" property="ghyt"/>
+        <result column="jzmj" property="jzmj" />
+        <result column="bdcdyh" property="bdcdyh"/>
+        <result column="tstybm" property="tstybm" />
+        <result column="tdsyqr" property="tdsyqr"/>
+        <result column="fwxz" property="fwxz"  />
+        <result column="qdjg" property="qdjg" />
+        <result column="fwjg" property="fwjg"/>
+    </resultMap>
+    <resultMap id="YWRMap" type="com.ztgeo.pointtopoint.handle.middleEntity.YWR">
+        <result column="qlrmc" property="qlrmc"></result>
+        <result column="zjhm" property="zjhm"></result>
+        <result column="zjzl" property="zjzl"></result>
+    </resultMap>
+
+    <!-- 查询预告登记 -->
+    <select id="findYGDJ" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select distinct yg.slbh as ywh,t.tstybm,yg.ygdjzl, yg.bdczmh as bdcdjzmh, yg.jgjc as djjg,yg.djrq as djsj,d.gyfs,yg.lifecycle as qszt,'' as zxsj
+        from dj_yg yg
+        left join dj_djb d ON d.slbh = yg.slbh
+        left join dj_tsgl t ON t.slbh = yg.slbh
+        where yg.slbh = #{slbh}
+    </select>
+
+    <!-- 查询预告房屋相关 -->
+    <select id="findYGFWXG" resultMap="YGFWXGMap" parameterType="java.lang.String">
+      select distinct qsdc.zl, nvl2(q.ghyt, q.ghyt, qsdc.ghyt) as ghyt, nvl2(q.jzmj, q.jzmj, qsdc.jzmj) as jzmj,
+        qsdc.bdcdyh, qsdc.tstybm, qsdc.tdsyqr, qsdc.fwxz, qsdc.qdjg, z.fwjg
+      from dj_tsgl tsgl
+      left join fc_h_qsdc qsdc on tsgl.tstybm = qsdc.tstybm
+      left join fc_z_qsdc z on qsdc.lsztybm = z.tstybm
+      left join ql_fwxg q on tsgl.slbh = q.slbh
+      where tsgl.tstybm = #{tstybm}
+    </select>
+
+    <!-- 查询义务人 -->
+    <select id="findYWR" resultMap="YWRMap" parameterType="java.lang.String">
+        select qlr.qlrmc,qlr.zjhm,qlr.zjlb as zjzl from dj_yg y left join dj_qlrgl q on y.slbh = q.slbh
+        left join dj_qlr qlr on q.qlrid = qlr.qlrid where q.qlrlx = '义务人' and y.slbh = #{slbh}
+    </select>
+
+    <insert id="saveToYGDJ" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_YGDJ (ID, BDCDYH, YGDJZL,
+        ZL, GHYT, JZMJ, BDCDJZMH,
+        DJJG, DJSJ, ZXSJ,
+        YWH, QSZT, QLRDH, QXDM,
+        GYR, GYFS, GYQK, YWR,
+        YWRZJZL, YWRZJH, TDSYQR,
+        FWXZ, FWJG, QDJG, CXRID
+        )
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+             #{item.id,jdbcType=VARCHAR},  #{item.bdcdyh,jdbcType=VARCHAR},  #{item.ygdjzl,jdbcType=VARCHAR},
+             #{item.zl,jdbcType=VARCHAR},  #{item.ghyt,jdbcType=VARCHAR},  #{item.jzmj,jdbcType=VARCHAR},  #{item.bdcdjzmh,jdbcType=VARCHAR},
+             #{item.djjg,jdbcType=VARCHAR},  #{item.djsj,jdbcType=VARCHAR},  #{item.zxsj,jdbcType=VARCHAR},
+             #{item.ywh,jdbcType=VARCHAR},  #{item.qszt,jdbcType=VARCHAR},  #{item.qlrdh,jdbcType=VARCHAR},  #{item.qxdm,jdbcType=VARCHAR},
+             #{item.gyr,jdbcType=VARCHAR},  #{item.gyfs,jdbcType=VARCHAR},  #{item.gyqk,jdbcType=VARCHAR},  #{item.ywr,jdbcType=VARCHAR},
+             #{item.ywrzjzl,jdbcType=VARCHAR},  #{item.ywrzjh,jdbcType=VARCHAR},  #{item.tdsyqr,jdbcType=VARCHAR},
+             #{item.fwxz,jdbcType=VARCHAR},  #{item.fwjg,jdbcType=VARCHAR},  #{item.qdjg,jdbcType=VARCHAR},  #{item.cxrid,jdbcType=VARCHAR}
+            from dual
+        </foreach>
+        )
+    </insert>
+    <select id="selectYGDJsByCXRId" resultType="com.ztgeo.pointtopoint.controller.entity.DirectYGDJ"
+            parameterType="java.lang.String">
+      select distinct BDCDYH, YGDJZL,
+        ZL, GHYT, JZMJ, BDCDJZMH,
+        DJJG, DJSJ, ZXSJ,
+        YWH, QSZT, QLRDH, QXDM,
+        GYR, GYFS, GYQK, YWR,
+        YWRZJZL, YWRZJH, TDSYQR,
+        FWXZ, FWJG, QDJG from GX_YGDJ where CXRID=#{cxrId}
+    </select>
+</mapper>

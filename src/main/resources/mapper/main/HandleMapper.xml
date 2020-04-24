@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.HandleMapper">
+    <resultMap id="BaseResultMap" type="com.ztgeo.pointtopoint.entity.SLBH">
+        <result column="slbh" property="slbh"/>
+        <result column="bdclx" property="bdclx"/>
+    </resultMap>
+    <resultMap id="zxMap" type="com.ztgeo.pointtopoint.handle.middleEntity.ZX">
+        <result column="djsj" property="djsj"/>
+        <result column="xgwh" property="xgwh"/>
+    </resultMap>
+
+    <!-- 查找个人现实受理编号 -->
+    <select id="findSLBH" resultMap="BaseResultMap" parameterType="com.ztgeo.pointtopoint.entity.CXR_MSG">
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlr.zjhm = #{qlrzjh} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '0') = '0'
+            AND nvl2(djb.lifecycle, djb.lifecycle, '0') = '0'
+            AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '0') = '0'
+    </select>
+
+    <!-- 查找公司现实受理编号 -->
+    <select id="findSLBHFirm" resultMap="BaseResultMap" parameterType="com.ztgeo.pointtopoint.entity.CXR_MSG">
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '0') = '0'
+          AND nvl2(djb.lifecycle, djb.lifecycle, '0') = '0'
+          AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '0') = '0'
+    </select>
+
+    <!-- 查找个人现实和历史受理编号 -->
+    <select id="findSLBHAll" resultMap="BaseResultMap" parameterType="com.ztgeo.pointtopoint.entity.CXR_MSG">
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlr.zjhm = #{qlrzjh} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '0') = '0'
+            AND nvl2(djb.lifecycle, djb.lifecycle, '0') = '0'
+            AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '0') = '0'
+        UNION
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlr.zjhm = #{qlrzjh} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '1') = '1'
+            AND nvl2(djb.lifecycle, djb.lifecycle, '1') = '1'
+            AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '1') = '1'
+    </select>
+
+    <!-- 查找公司现实和历史受理编号 -->
+    <select id="findSLBHFirmAll" resultMap="BaseResultMap" parameterType="com.ztgeo.pointtopoint.entity.CXR_MSG">
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '0') = '0'
+            AND nvl2(djb.lifecycle, djb.lifecycle, '0') = '0'
+            AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '0') = '0'
+        UNION
+        SELECT DISTINCT tsgl.slbh,tsgl.bdclx
+        FROM dj_tsgl tsgl
+        WHERE EXISTS (
+          SELECT 1 FROM dj_tsgl tsgl2 LEFT JOIN dj_djb djb ON tsgl2.slbh = djb.slbh
+          WHERE EXISTS (
+            SELECT 1 FROM dj_qlrgl qlrgl
+            WHERE EXISTS (
+              SELECT 1 FROM dj_qlr qlr
+              WHERE qlr.qlrmc = #{qlrmc} AND qlrgl.qlrid = qlr.qlrid
+            ) AND qlrgl.qlrlx in('权利人','抵押人') AND qlrgl.slbh = tsgl2.slbh
+          ) AND tsgl.tstybm = tsgl2.tstybm AND nvl2(tsgl2.lifecycle, tsgl2.lifecycle, '1') = '1'
+            AND nvl2(djb.lifecycle, djb.lifecycle, '1') = '1'
+            AND tsgl2.djzl NOT IN('查封注销','抵押注销','权属注销','预告注销','注销')
+        ) AND nvl2(tsgl.lifecycle, tsgl.lifecycle, '1') = '1'
+    </select>
+
+    <!-- 判断是不是抵押受理编号 -->
+    <select id="judgeDJ_DY" resultType="java.lang.Integer" parameterType="java.lang.String">
+      select count(*) as num from dj_dy where slbh = #{slbh,jdbcType=NVARCHAR}
+    </select>
+
+    <!-- 判断是不是查封受理编号 -->
+    <select id="judgeDJ_CF" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select count(*) as num from dj_cf where slbh = #{slbh,jdbcType=NVARCHAR}
+    </select>
+
+    <!-- 判断是否是这个人的抵押 -->
+    <select id="judgeDY" resultType="java.lang.String" parameterType="java.lang.String">
+        select nvl2(qlrgl.qlrmc,qlrgl.qlrmc,qlr.qlrmc) as qlrmc from dj_qlrgl qlrgl left join dj_qlr qlr on qlrgl.qlrid = qlr.qlrid where qlrgl.slbh = #{slbh,jdbcType=NVARCHAR} and qlrlx = '抵押人'
+    </select>
+
+    <!-- 判断是否是这个人的查封 -->
+    <select id="judgeCF" resultType="java.lang.String" parameterType="java.lang.String">
+        select nvl2(qlrgl.qlrmc,qlrgl.qlrmc,qlr.qlrmc) as qlrmc from dj_qlrgl qlrgl left join dj_qlr qlr on qlrgl.qlrid = qlr.qlrid where qlrgl.slbh = #{slbh,jdbcType=NVARCHAR} union select qlr as qlrmc from dj_cf where slbh = #{slbh,jdbcType=NVARCHAR}
+    </select>
+
+    <!-- 判断是否是这个人的权属 -->
+    <select id="judgeQS" resultType="java.lang.String" parameterType="java.lang.String">
+        select nvl2(qlrgl.qlrmc,qlrgl.qlrmc,qlr.qlrmc) as qlrmc from dj_qlrgl qlrgl left join dj_qlr qlr on qlrgl.qlrid = qlr.qlrid where qlrgl.slbh = #{slbh,jdbcType=NVARCHAR}
+    </select>
+
+    <!-- 注销登记 -->
+    <select id="zxdj" resultMap="zxMap" parameterType="java.lang.String">
+        select xgdjzx.djrq as djsj,xgdjzx.xgwh from dj_xgdjgl xgdjgl INNER join dj_xgdjzx xgdjzx on xgdjgl.zslbh = xgdjzx.slbh and xgdjgl.fslbh = #{slbh,jdbcType=NVARCHAR}
+    </select>
+</mapper>

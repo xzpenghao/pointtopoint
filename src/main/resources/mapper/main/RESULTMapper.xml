@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ztgeo.pointtopoint.mapper.mainMapper.RESULTMapper">
+    <!-- 保存到反馈结果表 -->
+    <insert id="saveToRESULT" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into GX_RESULT (ID,CODE, MSG, CXSQDH,FKSJ)
+        select * from (
+        <foreach collection="list" item="item" index="index" separator="union all">
+            select
+            #{item.id,jdbcType=VARCHAR},
+            #{item.code,jdbcType=VARCHAR},
+            #{item.msg,jdbcType=VARCHAR},
+            #{item.cxsqdh,jdbcType=VARCHAR},
+            #{item.fksj}
+            from dual
+        </foreach>
+        )
+    </insert>
+
+    <delete id="deleteRESULTByCxsqds" parameterType="java.util.List">
+        delete from GX_RESULT where CXSQDH IN
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+
+
+</mapper>

@@ -1,0 +1,81 @@
+﻿#配置日志级别
+logging:
+  level:
+    com.ztgeo.pointtopoint: debug
+
+#配置端口号
+server:
+  port: 9993
+
+#配置数据源
+spring:
+  datasource:
+    dbMain:
+      driver-class-name: oracle.jdbc.OracleDriver
+      type: com.alibaba.druid.pool.DruidDataSource
+      url: jdbc:oracle:thin:@10.3.4.140:1521:JWBDCDB
+      username: jwbdcsxk
+      password: Jw_Bdc_Sxk_5
+      initialSize: 20
+      minIdle: 20
+      maxActive: 200
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+  http:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+# 配置swagger
+swagger:
+  enabled: true
+  base-package: com.ztgeo.pointtopoint
+  title: PointToPoint
+  version: 1.0.0.SNAPSHOT
+  description: 点对点
+  contact:
+    name: yana
+
+#配置自定义属性，行政区代码、用户名、密码
+token:
+  xzqdm: 320305
+  username: gx320321
+  password: ae302f4ad2ed00b5cca75a4a4a7e6cf6
+#配置自定义属性，请求存储地址
+qqccdz: D:/1
+#配置自定义属性，请求超时时间
+timeout: 180000
+#配置自定义属性，是否查询老库
+scheduledMorningTime: 00 50 9 * * ?
+scheduledNightTime: 00 30 19 * * ?
+#url地址
+url:
+  tokenUrl: http://10.0.0.6:8090/realestate-supervise-exchange/api/v1/bdc/token  #获取安全令牌的接口地址
+  commitApplyUrl: http://10.0.0.6:8090/realestate-supervise-exchange/api/v1/bdc/query/commit/apply
+  receiveApplyUrl: http://10.0.0.6:8090/realestate-supervise-exchange/api/v1/bdc/query/receive/apply
+  commitResultUrl: http://10.0.0.6:8090/realestate-supervise-exchange/api/v1/bdc/query/commit/result
+  openIdUrl: http://10.0.0.6:8090/realestate-supervise-exchange/api/v1/bdc/credential/
+
+#redis配置
+redis:
+  host: 127.0.0.1
+  # Redis服务器连接端口
+  port: 6379
+  jedis:
+    pool:
+      #连接池最大连接数（使用负值表示没有限制）
+      max_active: 100
+      # 连接池中的最小空闲连接
+      max_idle: 10
+      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+      max_wait: 100000
+  # 连接超时时间（毫秒）
+  timeout: 5000
+  #默认是索引为0的数据库
+  database: 0
+
